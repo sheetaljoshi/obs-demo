@@ -15,5 +15,5 @@
     "recursors": [ "8.8.8.8" ],
     "bind_addr": "__HOST_IP__",
     "node_name": "__HOST_NAME__",
-    "data_dir": "/var/data"
+    "data_dir": "/var/data/consul"
 }

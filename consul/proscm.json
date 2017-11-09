@@ -1,7 +1,1 @@
-{
-        "ServiceID":"proscm",
-        "ServiceName":"proscm",
-        "ServiceTags":["_cc._tcp"],
-        "ServiceAddress":"10.0.1.15",
-        "ServicePort":3900
-}
+{"service": {"name": "proscm", "tags": ["__cc._tcp"], "port": 3900, "address": "10.13.1.2"}}
