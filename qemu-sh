@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# IMPORTANT: Change the "VM NAME" string to match your actual VM Name.
+# In order to create rules to other VMs, just duplicate the below block and configure
+# it accordingly.
+if [ "${1}" = "proscm" ]; then
+
+   # Update the following variables to fit your setup
+   VIRT_BRIDGE=proscm
+   PROSCM_GUEST_IP=$(for mac in `virsh domiflist proscm |grep -o -E "([0-9a-f]{2}:){5}([0-9a-f]{2})"` ; do arp -e |grep $mac  |grep -o -P "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" ; done)
+   GUEST_PORTS=(443 3899 3898 2200 3900 3901 3902 3903 3904)
+   PROSCM_HOST_IP=`ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+   echo $VIRT_BRIDGE $PROSCM_GUEST_IP $PROSCM_HOST_IP
+
+   if [ "${2}" = "stopped" ] || [ "${2}" = "reconnect" ]; then
+  	#/sbin/iptables -D FORWARD -o $VIRT_BRIDGE -d  $PROSCM_GUEST_IP -j ACCEPT
+        iptables -I FORWARD -m state -d 192.168.22.0/24 --state NEW,RELATED,ESTABLISHED -j ACCEPT
+  	for PORT in ${GUEST_PORTS[@]}
+	do
+		echo "Setting iptables forwarding rule $PROSCM_HOST_IP:$PORT => $PROSCM_GUEST_IP:$PORT"
+  		/sbin/iptables -t nat -I PREROUTING -p tcp -d $PROSCM_HOST_IP --dport $PORT -j DNAT --to-destination $PROSCM_GUEST_IP:$PORT
+	done
+	
+   fi
+   if [ "${2}" = "start" ] || [ "${2}" = "reconnect" ]; then
+	#/sbin/iptables -D FORWARD -o $VIRT_BRIDGE -d  $PROSCM_GUEST_IP -j ACCEPT
+        iptables -I FORWARD -m state -d 192.168.22.0/24 --state NEW,RELATED,ESTABLISHED -j ACCEPT
+	for PORT in ${GUEST_PORTS[@]}
+        do
+		echo "Setting iptables forwarding rule $PROSCM_HOST_IP:$PORT => $PROSCM_GUEST_IP:$PORT"
+                /sbin/iptables -t nat -I PREROUTING -p tcp -d $PROSCM_HOST_IP --dport $PORT -j DNAT --to-destination $PROSCM_GUEST_IP:$PORT
+        done
+   fi
+fi

@@ -1,0 +1,18 @@
+<!--
+This is vGW-wan bridge
+-->
+
+<network>
+  <name>vGW-wan</name>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='vGW-wan' stp='on' delay='0'/>
+  <ip address='10.0.1.16' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.0.1.16' end='10.10.1.254'/>
+    </dhcp>
+  </ip>
+</network>

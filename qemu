@@ -1,0 +1,102 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import syslog
+
+domain = sys.argv[1]
+action = sys.argv[2]
+
+iptables = '/sbin/iptables'
+
+syslog.syslog('Processing QEMU Signal, domain: ' + domain + ', action:'
+              + action)
+
+iptables = '/sbin/iptables'
+
+f = os.popen('ifconfig eth0 | grep "inet\ addr" | cut -d: -f2 | cut -d" " -f1')
+publicip=f.read().rstrip('\n')
+
+syslog.syslog('Setting iptables rules for source ip : ' + publicip)
+
+mapping = {
+  "proscm": {
+    "ip": "192.168.22.2",
+    "publicip": publicip,
+    "portmap": {
+      "tcp": [
+        #443 3899 3898 2200 3900 3901 3902 3903 3904
+        (443, 443),
+        (3899, 3899),
+        (3898, 3898),
+      ]
+    }
+  }
+}
+
+syslog.syslog('Processing QEMU Signal, domain: ' + domain + ', action:'
+              + action)
+
+def rules(act, map_dict):
+    if map_dict['portmap'] == 'all':
+        cmd = \
+            '{} -t nat {} PREROUTING -d {} -j DNAT --to {}'.format(iptables,
+                act, map_dict['publicip'], map_dict['ip'])
+        os.system(cmd)
+        syslog.syslog(cmd)
+        cmd = \
+            '{} -t nat {} POSTROUTING -s {} -j SNAT --to {}'.format(iptables,
+                act, map_dict['ip'], map_dict['publicip'])
+        os.system(cmd)
+        syslog.syslog(cmd)
+        cmd = \
+            '{} -t filter {} FORWARD -d {} -j ACCEPT'.format(iptables,
+                act, map_dict['ip'])
+        os.system(cmd)
+        syslog.syslog(cmd)
+        cmd = \
+            '{} -t filter {} FORWARD -s {} -j ACCEPT'.format(iptables,
+                act, map_dict['ip'])
+        os.system(cmd)
+        syslog.syslog(cmd)
+    else:
+        for proto in map_dict['portmap']:
+            for portmap in map_dict['portmap'].get(proto):
+                cmd = \
+                    '{} -t nat {} PREROUTING -d {} -p {} --dport {} -j DNAT --to {}:{}'.format(
+                    iptables,
+                    act,
+                    map_dict['publicip'],
+                    proto,
+                    str(portmap[0]),
+                    map_dict['ip'],
+                    str(portmap[1]),
+                    )
+                os.system(cmd)
+                syslog.syslog(cmd)
+                cmd = \
+                    '{} -t filter {} FORWARD -d {} -p {} --dport {} -j ACCEPT'.format(iptables,
+                        act, map_dict['ip'], proto, str(portmap[1]))
+                os.system(cmd)
+                syslog.syslog(cmd)
+                cmd = \
+                    '{} -t filter {} FORWARD -s {} -p {} --sport {} -j ACCEPT'.format(iptables,
+                        act, map_dict['ip'], proto, str(portmap[1]))
+                os.system(cmd)
+                syslog.syslog(cmd)
+
+
+host = mapping.get(domain)
+
+if host is None:
+    sys.exit(0)
+
+if action == 'stopped' or action == 'reconnect':
+    rules('-D', host)
+    syslog.syslog('Removed all the iptables rules for ' + domain)
+
+if action == 'start' or action == 'reconnect':
+    rules('-I', host)
+    syslog.syslog('Created all the iptables rules for ' + domain)
+

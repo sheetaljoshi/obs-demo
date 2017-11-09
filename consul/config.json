@@ -1,0 +1,19 @@
+{
+    "bootstrap": true,
+    "server": true,
+    "enable_syslog": true,
+    "datacenter": "__HOST_DC__",
+    "domain": "__HOST_DOMAIN__",
+    "log_level": "INFO",
+    "addresses": {
+      "http": "0.0.0.0",
+      "dns": "0.0.0.0"
+    },
+    "ports": {
+      "dns": 53
+    },
+    "recursors": [ "8.8.8.8" ],
+    "bind_addr": "__HOST_IP__",
+    "node_name": "__HOST_NAME__",
+    "data_dir": "/var/data"
+}

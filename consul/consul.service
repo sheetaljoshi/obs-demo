@@ -1,0 +1,20 @@
+[Unit]
+Description=Consul service discovery agent
+Requires=network-online.target
+After=network.target
+
+[Service]
+User=root
+PIDFile=/var/run/consul.pid
+Restart=on-failure
+Environment=GOMAXPROCS=2
+ExecStartPre=/bin/rm -f /var/run/consul.pid
+ExecStartPre=/root/obs-demo/consul/prestart.sh
+ExecStartPre=/usr/local/bin/consul validate /etc/consul.d/server/config.json
+ExecStart=/usr/local/bin/consul agent $OPTIONS -pid-file=/var/run/consul.pid -config-dir=/etc/consul.d/server
+ExecReload=/bin/kill -s HUP $MAINPID
+KillSignal=SIGINT
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

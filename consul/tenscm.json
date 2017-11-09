@@ -1,0 +1,7 @@
+{
+        "ServiceID":"tenscm",
+        "ServiceName":"tenscm",
+        "ServiceTags":["_cc._tcp"],
+        "ServiceAddress":"172.16.1.10",
+        "ServicePort":3900
+}

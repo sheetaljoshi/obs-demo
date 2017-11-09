@@ -1,0 +1,40 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import syslog
+
+network = sys.argv[1]
+action = sys.argv[2]
+
+syslog.syslog('Processing Network Signal, network: ' + network + ', action:'
+              + action)
+
+brctl = '/sbin/brctl'
+
+mapping = {
+  "proscm": "eth1",
+  "provgw": "eth2"
+}
+
+def bridgeport(port):
+    if port is not None:
+        cmd = \
+            '{} addif {} {}'.format(brctl,
+                network, port)
+        os.system(cmd)
+        syslog.syslog(cmd)
+
+
+if network is None:
+    sys.exit(0)
+
+port = mapping.get(network)
+
+if action == 'stopped' or action == 'unplugged':
+    syslog.syslog('Network down' + network)
+
+if action == 'start' or action == 'plugged':
+    bridgeport(port)
+    syslog.syslog('Adding bridge ports for network ' + network)

@@ -1,0 +1,7 @@
+{
+        "ServiceID":"proscm",
+        "ServiceName":"proscm",
+        "ServiceTags":["_cc._tcp"],
+        "ServiceAddress":"10.0.1.15",
+        "ServicePort":3900
+}

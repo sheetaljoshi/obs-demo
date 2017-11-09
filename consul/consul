@@ -1,0 +1,6 @@
+#
+# Consul & Nomad related
+#
+export DOMAIN=orange.com
+export DATACENTER=dc1
+export CONSUL_NET_BIND=eno1

@@ -1,0 +1,12 @@
+<!--
+This is sdp inetbr bridge
+-->
+
+<network>
+  <name>tenantscm-wan</name>
+  <uuid>ddb9f0e8-bae1-4960-9cb0-5e30bcd650ef</uuid>
+  <bridge name='tenantscm-wan' stp='on' delay='0'/>
+  <mac address='52:54:00:ed:f0:47'/>
+  <ip address='172.16.1.0' netmask='255.255.255.0'>
+  </ip>
+</network>

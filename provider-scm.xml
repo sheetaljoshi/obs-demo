@@ -1,0 +1,36 @@
+<domain type='kvm'>
+  <name>proscm</name>
+  <memory unit='GB'>1</memory>
+  <vcpu>2</vcpu>
+  <os>
+    <type arch='x86_64'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+  </features>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/var/images/proscm.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <interface type='bridge'>
+      <source bridge='proscm'/>
+      <model type='virtio'/>
+      <mac address="52:54:00:a0:cc:19"/>
+    </interface>
+ <serial type='pty'>
+   <target port='0'/>
+ </serial>
+ <console type='pty'>
+   <target type='serial' port='0'/>
+ </console>
+<graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'/>
+  </devices>
+</domain>
