@@ -14,8 +14,8 @@ syslog.syslog('Processing Network Signal, network: ' + network + ', action:'
 brctl = '/sbin/brctl'
 
 mapping = {
-  "proscm": "eth1",
-  "provgw": "eth2"
+  "proscm": "eth2",
+  "gw": "eth1"
 }
 
 def bridgeport(port):
